@@ -1,0 +1,48 @@
+.comment-input {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.comment-input .item {
+    margin-bottom: 20px;
+}
+
+.comment-input .item label {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.comment-input .item label span {
+    font-size: 14px;
+}
+
+.comment-input .item label input, 
+.comment-input .item label textarea {
+    width: 320px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    outline: none;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.comment-input .item label textarea {
+    height: 100px;
+    resize: none;
+    overflow: hidden;
+}
+
+/* 发布 */
+.comment-input .send-box {
+    text-align: right;
+}
+
+.comment-input .send-box button {
+    border: none;
+    outline: none;
+    background-color: cornflowerblue;
+    color: #fff;
+    padding: 5px 15px;
+    border-radius: 3px;
+}

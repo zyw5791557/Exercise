@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>抽象公共组件类</title>
+</head>
+<body>
+    <div id="wrapper"></div>
+</body>
+<script>
+
+    /* DOM字符串转DOM节点 */
+    const createStringToDom = str => {
+        const ele = document.createElement('div');
+        ele.innerHTML = str;
+        return ele;
+    }
+
+    /* Mount */
+    const mount = (component, wrapper) => {
+        wrapper.appendChild(component._renderDom());
+        component.changeState = (oldEl, newEl) => {
+            wrapper.insertBefore(newEl, oldEl);
+            wrapper.removeChild(oldEl);
+        }
+    }
+
+    /* Components */
+    class Components {
+        constructor (props = {}) {
+            this.props = props;
+        }
+        setState (context) {
+            const oldEl = this.el;
+            Object.assign(this.state, context)
+            this._renderDom();
+            if (this.changeState) {
+                this.changeState(oldEl, this.el)
+            }
+        }
+        _renderDom () {
+            this.el = createStringToDom(this.render());
+            this.el.addEventListener('click', this.clickEvent.bind(this), false);
+            return this.el;
+        }
+    }
+
+    /* ZanButton */
+    class ZanButton extends Components {
+        constructor (props) {
+            super(props);
+            this.state = {
+                isLike: false
+            }
+        }
+        clickEvent () {
+            this.setState({
+                isLike: !this.state.isLike
+            })
+        }
+        render () {
+            return (
+                `
+                    <button style="background-color: ${ this.props.bgColor }">
+                        ${ this.state.isLike ? '取消' : '点赞' }
+                    </button>
+                `
+            )
+        }
+    }
+
+    const wrapper = document.getElementById('wrapper');
+    mount(new ZanButton(), wrapper);
+    mount(new ZanButton({
+        bgColor: 'red'
+    }), wrapper);
+
+</script>
+</html>

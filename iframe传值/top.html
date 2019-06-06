@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Top</title>
+</head>
+<body>
+    <div id="app">
+        <h3>{{ title }}</h3>
+        <iframe ref="ide" src="./iframe.html" frameborder="0"></iframe>
+    </div>
+<script src="https://cdn.bootcss.com/vue/2.6.10/vue.js"></script>
+<script>
+    const vm = new Vue({
+        el: '#app',
+        data: {
+            title: 'iframe 传值测试'
+        },
+        mounted () {
+            window.onload = () => {
+                const iframe = window.frames[0];
+                const msgData = {
+                    username: 'Emlice',
+                    password: 'ccb123'
+                };
+                const originTarget = '*';
+                iframe.postMessage(msgData, originTarget)
+            }
+        }
+    })
+</script>
+</body>
+</html>

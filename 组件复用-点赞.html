@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>组件复用</title>
+</head>
+<body>
+    <div id="wrapper"></div>
+</body>
+<script>
+    function stringToDom (str) {
+        const ele = document.createElement('div');
+        ele.innerHTML = str;
+        return ele;
+    }
+    class ZanButton {
+        constructor () {
+            this.state = {
+                isLike: false
+            }
+        }
+        setState (context) {
+            const oldEl = this.el;
+            Object.assign(this.state, context);
+            // 这边的 el 相当于新建一个DOM节点对象并返回，所以不存在引用关系
+            this.el = this.render();
+            if (this.onStateChange) {
+                this.onStateChange(oldEl, this.el);
+            }
+        }
+        clickController () {
+            this.setState({
+                isLike: !this.state.isLike
+            })
+        }
+        render () {
+            this.el = stringToDom(`
+                <button class="btn-text">${ this.state.isLike ? '取消' : '点赞' }</button>
+            `);
+            this.el.addEventListener('click', this.clickController.bind(this), false)
+            return this.el;
+        }
+    }
+    const wrapper = document.getElementById('wrapper');
+    const zanBtn1 = new ZanButton();
+    // 首次插入
+    wrapper.appendChild(zanBtn1.render())
+    // 动态插入
+    zanBtn1.onStateChange = (oldEl, newEl) => {
+        wrapper.insertBefore(newEl, oldEl);
+        wrapper.removeChild(oldEl);
+    }
+</script>
+</html>

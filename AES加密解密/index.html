@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>AES加密/解密测试</title>
+    <style>
+        #wrapper {
+            text-align: center;
+        }
+
+        .show {
+            min-height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <h3>AES加密/解密测试</h3>
+        <label>
+            KEY：
+            <input id="key" type="text" placeholder="请输入密钥" value="ABCDEF0123456789" />
+        </label><br><br>
+        <label>
+            明文：
+            <input id="encryptText" type="text" placeholder="请输入要加密的内容" />
+        </label>
+        <p class="show" id="showEncryptText"></p>
+        <label>
+            密文：
+            <input id="decryptText" type="text" placeholder="请输入要解密的内容" />
+        </label>
+        <p class="show" id="showDecryptText"></p>
+    </div>
+    <!-- CryptoJS AES 加密算法包 -->
+    <script src="./crypto-aes.js"></script>
+    <script>
+        /*
+CryptoJS v3.1.2
+code.google.com/p/crypto-js
+(c) 2009-2013 by Jeff Mott. All rights reserved.
+code.google.com/p/crypto-js/wiki/License
+*/
+        /**
+         * Electronic Codebook block mode.
+         */
+        CryptoJS.mode.ECB = (function () {
+            var ECB = CryptoJS.lib.BlockCipherMode.extend();
+
+            ECB.Encryptor = ECB.extend({
+                processBlock: function (words, offset) {
+                    this._cipher.encryptBlock(words, offset);
+                }
+            });
+
+            ECB.Decryptor = ECB.extend({
+                processBlock: function (words, offset) {
+                    this._cipher.decryptBlock(words, offset);
+                }
+            });
+
+            return ECB;
+        }());
+
+
+        /* CryptoClass */
+        class CryptoClass {
+            constructor(key) {
+                this.key = CryptoJS.enc.Utf8.parse(key);
+            }
+            encryptHandle(encryptStr) {
+                var pass = CryptoJS.AES.encrypt(encryptStr, this.key, {
+                    mode: CryptoJS.mode.ECB,
+                    padding: CryptoJS.pad.Pkcs7
+                })
+                var hesPass = CryptoJS.enc.Hex.parse(pass.ciphertext.toString());
+                var base64Pass = CryptoJS.enc.Base64.stringify(hesPass);
+                console.log()
+                console.log('pass', pass)
+                console.log('hesPass', hesPass)
+                console.log('base64Pass', base64Pass)
+                return base64Pass;
+            }
+            decryptHandle(decryptStr) {
+               
+                var decryptData = CryptoJS.AES.decrypt(decryptStr, this.key, {
+                    mode: CryptoJS.mode.ECB,
+                    padding: CryptoJS.pad.Pkcs7
+                });
+                
+                const plaintext = decryptData.toString(CryptoJS.enc.Utf8);
+                console.log(decryptData, plaintext)
+                return plaintext
+            }
+        }
+        // 全局密钥
+        const keyDom = document.getElementById('key');
+        const cryptoClass = new CryptoClass(keyDom.value);
+        const encryptDom = document.getElementById('encryptText');
+        const decryptDom = document.getElementById('decryptText');
+        const encryptShow = document.getElementById('showEncryptText');
+        const decryptShow = document.getElementById('showDecryptText');
+        keyDom.addEventListener('keydown', e => {
+            if (e.keyCode === 13) {
+                cryptoClass.key = keyDom.value;
+                encryptShow.innerText = cryptoClass.encryptHandle(encryptDom.value);
+                decryptDom.value = '';
+                decryptShow.innerText = ''
+            }
+        }, false)
+        encryptDom.addEventListener('keydown', e => {
+            if (e.keyCode === 13) {
+                encryptShow.innerText = cryptoClass.encryptHandle(encryptDom.value)
+            }
+        }, false)
+        decryptDom.addEventListener('keydown', e => {
+            if (e.keyCode === 13) {
+                decryptShow.innerText = cryptoClass.decryptHandle(decryptDom.value)
+            }
+        }, false)
+    </script>
+</body>
+
+</html>
