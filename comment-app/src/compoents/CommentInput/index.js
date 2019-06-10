@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import './index.css';
 
+// higher order component
+import wrapWithLoadData from '../../higher/wrapWithLoadData'
+
 class CommentInput extends Component {
-    static defaultProps = {
-        user: ''
-    }
-    static propTypes = {
-        user: PropTypes.string
-    }
     constructor () {
         super()
         this.state = {
@@ -16,10 +12,16 @@ class CommentInput extends Component {
             content: ''
         }
     }
+    componentWillMount () {
+        const username = this.props.data || ''
+        this.setState({ username })
+    }
+    componentDidMount () {
+        /* DOM渲染完自动聚焦到评论框 */
+        this.comment.focus()
+    }
     changeUsername (e) {
         const val = e.target.value;
-        /* 数据持久化 */
-        localStorage.setItem('username', val)
         this.setState({
             username: val
         })
@@ -48,15 +50,6 @@ class CommentInput extends Component {
             content: ''
         })
     }
-    componentWillMount () {
-        this.setState({
-            username: this.props.user
-        })
-    }
-    componentDidMount () {
-        /* DOM渲染完自动聚焦到评论框 */
-        this.comment.focus()
-    }
     render () {
         return (
             <div className="comment-input">
@@ -66,6 +59,7 @@ class CommentInput extends Component {
                         <input 
                             type="text" 
                             value={ this.state.username } 
+                            onBlur={ e => this.props.saveData(e.target.value) }
                             onChange={ this.changeUsername.bind(this) }/>
                     </label>
                 </div>
@@ -86,5 +80,7 @@ class CommentInput extends Component {
         )
     }
 }
+
+CommentInput = wrapWithLoadData(CommentInput, 'username')
 
 export default CommentInput;

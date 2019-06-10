@@ -4,33 +4,20 @@ import CommentList from '../CommentList/';
 import cloneDeep from 'lodash/cloneDeep';
 import './index.css';
 
+// higher order component
+import wrapWithLoadData from '../../higher/wrapWithLoadData'
+
 class CommentApp extends Component {
-    constructor () {
-        super();
-        this.state = {
-            cacheUser: '',
-            commentList: []
-        }
-    }
     componentWillMount () {
-        /* 数据持久化 */
-        const cacheUser = localStorage.getItem('username') || '';
-        const commentList = JSON.parse(localStorage.getItem('commmentList')) || [];
-        this.setState({
-            cacheUser,
-            commentList
-        })
+        const commentList = this.props.data || [];
+        this.setState({ commentList })
     }
     sendHandle (comment) {
         const arr = this.state.commentList.concat([comment]);
-        this.setCommentList(arr);
+        this.props.saveData(arr);
         this.setState({
             commentList: arr
         })
-    }
-    setCommentList (arr) {
-        /* 数据持久化 */
-        localStorage.setItem('commmentList', JSON.stringify(arr))
     }
     onDel (id) {
         const arr = cloneDeep(this.state.commentList);
@@ -42,16 +29,18 @@ class CommentApp extends Component {
         this.setState({
             commentList: arr
         })
-        this.setCommentList(arr)
+        this.props.saveData(arr);
     }
     render () {
         return (
             <div className="comment-app">
-                <CommentInput user={ this.state.cacheUser } onSend={ this.sendHandle.bind(this) } />
+                <CommentInput onSend={ this.sendHandle.bind(this) } />
                 <CommentList onDel={ this.onDel.bind(this) } commentData={ this.state.commentList } />
             </div>
         )
     }
 }
+
+CommentApp = wrapWithLoadData(CommentApp, 'commentList')
 
 export default CommentApp;
